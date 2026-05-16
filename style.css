@@ -895,8 +895,8 @@ img { display: block; max-width: 100%; }
 .prev-citi       { background: linear-gradient(135deg, #001a0d 0%, #003d1f 60%, #005c2e 100%); }
 .prev-citi       .cert-doc-svg { color: rgba(50,210,100,0.7); }
 
-.prev-compliance { background: linear-gradient(135deg, #1a0a2e 0%, #2d1052 60%, #3d1470 100%); }
-.prev-compliance .cert-doc-svg { color: rgba(160,100,255,0.7); }
+.prev-compliance { background: linear-gradient(135deg, #001a0d 0%, #003d1f 60%, #005c2e 100%); }
+.prev-compliance .cert-doc-svg { color: rgba(50,210,100,0.7); }
 
 .prev-perspective{ background: linear-gradient(135deg, #001428 0%, #002a52 60%, #003d78 100%); }
 .prev-perspective .cert-doc-svg { color: rgba(14,165,233,0.75); }
