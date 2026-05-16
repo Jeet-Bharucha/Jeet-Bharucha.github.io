@@ -857,12 +857,49 @@ img { display: block; max-width: 100%; }
 }
 .cert-card-new:hover .cert-preview-img img { opacity: 1; }
 
-.cert-doc-icon {
-  font-size: 2.8rem;
-  opacity: 0.5;
+/* Brand color previews */
+.prev-watermark {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 2px;
+  opacity: 0.12;
+  color: #fff;
+  user-select: none;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -70%);
+  white-space: nowrap;
+}
+.cert-doc-svg {
+  color: rgba(255,255,255,0.55);
   transition: all 0.25s;
 }
-.cert-card-new:hover .cert-doc-icon { opacity: 0.8; transform: scale(1.1); }
+.cert-doc-svg svg { width: 40px; height: 40px; }
+.cert-card-new:hover .cert-doc-svg { color: rgba(255,255,255,0.85); transform: scale(1.1); }
+
+.prev-azure      { background: linear-gradient(135deg, #0a1628 0%, #0d2b52 60%, #0e3d7a 100%); }
+.prev-azure      .cert-doc-svg { color: rgba(0,170,255,0.7); }
+
+.prev-sql        { background: linear-gradient(135deg, #001a2e 0%, #003d5c 60%, #005f8a 100%); }
+.prev-sql        .cert-doc-svg { color: rgba(0,150,220,0.7); }
+
+.prev-python     { background: linear-gradient(135deg, #0d1f35 0%, #1a3a5c 60%, #1e4976 100%); }
+.prev-python     .cert-doc-svg { color: rgba(255,212,59,0.8); }
+
+.prev-nptel      { background: linear-gradient(135deg, #2a0a00 0%, #5c1a00 60%, #8a2800 100%); }
+.prev-nptel      .cert-doc-svg { color: rgba(255,100,50,0.8); }
+
+.prev-citi       { background: linear-gradient(135deg, #001a0d 0%, #003d1f 60%, #005c2e 100%); }
+.prev-citi       .cert-doc-svg { color: rgba(50,210,100,0.7); }
+
+.prev-compliance { background: linear-gradient(135deg, #1a0a2e 0%, #2d1052 60%, #3d1470 100%); }
+.prev-compliance .cert-doc-svg { color: rgba(160,100,255,0.7); }
+
+.prev-perspective{ background: linear-gradient(135deg, #001428 0%, #002a52 60%, #003d78 100%); }
+.prev-perspective .cert-doc-svg { color: rgba(14,165,233,0.75); }
 
 .cert-overlay {
   position: absolute;
