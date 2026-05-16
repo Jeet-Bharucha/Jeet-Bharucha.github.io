@@ -1106,6 +1106,28 @@ img { display: block; max-width: 100%; }
 .shot-kw  { color: #9d6fff; }
 .shot-dim { opacity: 0.45; }
 
+/* Tic Tac Toe */
+.shot-ttt { background: linear-gradient(160deg, #0d0818 0%, #1a0f30 100%); }
+.shot-ttt-board { align-items: center; justify-content: center; }
+.ttt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 36px);
+  gap: 4px;
+}
+.ttt-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+}
+.ttt-x { color: #9d6fff; }
+.ttt-o { color: #22d3ee; }
+
 /* Blackjack */
 .shot-blackjack { background: linear-gradient(160deg, #051208 0%, #0a1f0d 100%); }
 .shot-cards {
