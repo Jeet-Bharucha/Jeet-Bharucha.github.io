@@ -338,6 +338,11 @@ img { display: block; max-width: 100%; }
   50%      { opacity:1;   transform:scale(1.06); }
 }
 
+/* Stat card row wrapper — transparent on desktop so absolute cards stay relative to .hero-image */
+.hero-stats-row {
+  display: contents;
+}
+
 /* Floating stat cards */
 .hero-stat-card {
   position: absolute;
@@ -1291,18 +1296,20 @@ img { display: block; max-width: 100%; }
   .hero-bio   { max-width: 100%; }
   .hero-cta, .hero-socials { justify-content: center; }
 
-  .photo-ring { width: 220px; height: 220px; flex: 0 0 100%; }
-  .hero-image {
-    flex-wrap: wrap;
+  .photo-ring { width: 220px; height: 220px; }
+  .hero-image { flex-direction: column; align-items: center; gap: 16px; }
+
+  /* Row wrapper becomes a real flex row on mobile */
+  .hero-stats-row {
+    display: flex;
+    gap: 12px;
     justify-content: center;
-    gap: 14px;
-    padding-bottom: 0;
   }
+  /* Cards go back to normal flow — no absolute positioning on mobile */
   .hero-stat-card {
     position: static;
-    padding: 8px 20px;
+    padding: 8px 18px;
     animation: none;
-    top: auto; bottom: auto; left: auto; right: auto;
   }
   .stat-num { font-size: 1.1rem; }
   .stat-label { font-size: 0.65rem; }
