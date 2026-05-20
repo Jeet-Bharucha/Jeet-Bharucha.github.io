@@ -338,9 +338,11 @@ img { display: block; max-width: 100%; }
   50%      { opacity:1;   transform:scale(1.06); }
 }
 
-/* Stat card row wrapper — transparent on desktop so absolute cards stay relative to .hero-image */
+/* Stat card row wrapper — block with no in-flow content on desktop (cards are position:absolute) */
 .hero-stats-row {
-  display: contents;
+  display: block;
+  position: static;
+  /* height collapses to 0 because all children are position:absolute */
 }
 
 /* Floating stat cards */
@@ -1162,6 +1164,48 @@ img { display: block; max-width: 100%; }
   margin-left: auto;
 }
 
+/* StockAI */
+.shot-stockai { background: linear-gradient(160deg, #020b14 0%, #051a2e 100%); }
+.shot-stockai-body {
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 4px;
+}
+.stockai-ticker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stockai-sym  { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #e2f0ff; }
+.stockai-price { font-size: 0.8rem; color: #94a3b8; }
+.stockai-up   { font-size: 0.75rem; font-weight: 700; color: #22d3ee; }
+.stockai-signal { display: flex; align-items: center; gap: 8px; }
+.stockai-pill {
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.stockai-pill.buy { background: rgba(34,211,238,0.2); color: #22d3ee; border: 1px solid rgba(34,211,238,0.4); }
+.stockai-conf { font-size: 0.7rem; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+.stockai-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+  width: 100%;
+}
+.sbar {
+  flex: 1;
+  background: rgba(157,111,255,0.35);
+  border-radius: 2px 2px 0 0;
+  transition: height 0.3s;
+}
+.sbar.up { background: rgba(34,211,238,0.5); }
+
 /* ── CONTACT ── */
 .contact-layout {
   display: grid;
@@ -1296,20 +1340,30 @@ img { display: block; max-width: 100%; }
   .hero-bio   { max-width: 100%; }
   .hero-cta, .hero-socials { justify-content: center; }
 
-  .photo-ring { width: 220px; height: 220px; }
-  .hero-image { flex-direction: column; align-items: center; gap: 16px; }
+  .photo-ring {
+    width: 220px; height: 220px;
+    flex: none;        /* prevent any flex-stretching */
+    align-self: center;
+  }
+  .hero-image {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
 
-  /* Row wrapper becomes a real flex row on mobile */
+  /* Stats row becomes a real side-by-side grid on mobile */
   .hero-stats-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto;
     gap: 12px;
     justify-content: center;
   }
-  /* Cards go back to normal flow — no absolute positioning on mobile */
+  /* Cards back to normal flow on mobile */
   .hero-stat-card {
     position: static;
     padding: 8px 18px;
     animation: none;
+    width: auto;
   }
   .stat-num { font-size: 1.1rem; }
   .stat-label { font-size: 0.65rem; }
