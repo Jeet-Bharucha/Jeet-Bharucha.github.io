@@ -173,3 +173,214 @@ function closeCert() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeCert();
 });
+
+/* ══════════════════════════════════════════
+   ── CUSTOM CURSOR (desktop only) ──
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(pointer: coarse)').matches) return; // skip touch/mobile
+
+  const dot  = document.createElement('div');
+  const ring = document.createElement('div');
+  dot.className  = 'c-dot';
+  ring.className = 'c-ring';
+  document.body.append(dot, ring);
+
+  let mx = -200, my = -200, rx = -200, ry = -200;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  });
+
+  (function tickRing() {
+    rx += (mx - rx) * 0.1;
+    ry += (my - ry) * 0.1;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(tickRing);
+  })();
+
+  document.querySelectorAll('a, button, .project-card, .cert-card, .stack-card, .icon-btn').forEach(el => {
+    el.addEventListener('mouseenter', () => { dot.classList.add('expanded'); ring.classList.add('expanded'); });
+    el.addEventListener('mouseleave', () => { dot.classList.remove('expanded'); ring.classList.remove('expanded'); });
+  });
+})();
+
+/* ══════════════════════════════════════════
+   ── CONSTELLATION PARTICLE CANVAS ──
+══════════════════════════════════════════ */
+(function () {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'hero-canvas';
+  hero.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = hero.offsetWidth;
+    canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  const COUNT = 70;
+  const LINK_DIST = 130;
+  const mouse = { x: -999, y: -999 };
+
+  document.addEventListener('mousemove', e => {
+    const rect = hero.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  const pts = Array.from({ length: COUNT }, () => ({
+    x:  Math.random() * canvas.width,
+    y:  Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.45,
+    vy: (Math.random() - 0.5) * 0.45,
+    r:  Math.random() * 1.4 + 0.4,
+  }));
+
+  let raf;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // move
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+      // mouse repulsion
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < 90) { p.x += (dx / d) * 1.2; p.y += (dy / d) * 1.2; }
+    });
+
+    // connecting lines
+    for (let i = 0; i < COUNT; i++) {
+      for (let j = i + 1; j < COUNT; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < LINK_DIST) {
+          const a = (1 - d / LINK_DIST) * 0.28;
+          ctx.strokeStyle = `rgba(157,111,255,${a})`;
+          ctx.lineWidth   = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // dots
+    pts.forEach(p => {
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const near = Math.sqrt(dx * dx + dy * dy) < 100;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, near ? p.r * 2 : p.r, 0, Math.PI * 2);
+      ctx.fillStyle = near ? 'rgba(34,211,238,0.9)' : 'rgba(157,111,255,0.65)';
+      ctx.fill();
+    });
+
+    raf = requestAnimationFrame(draw);
+  }
+  draw();
+
+  // pause when tab hidden for perf
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cancelAnimationFrame(raf);
+    else draw();
+  });
+})();
+
+/* ══════════════════════════════════════════
+   ── 3D TILT ON PROJECT CARDS ──
+══════════════════════════════════════════ */
+document.querySelectorAll('.project-card').forEach(card => {
+  let leaveTimer;
+
+  card.addEventListener('mousemove', e => {
+    clearTimeout(leaveTimer);
+    const { left, top, width, height } = card.getBoundingClientRect();
+    const x = e.clientX - left, y = e.clientY - top;
+    const rotX = ((y - height / 2) / height) * -12;
+    const rotY = ((x - width  / 2) / width)  *  12;
+    const glowX = (x / width  * 100).toFixed(1);
+    const glowY = (y / height * 100).toFixed(1);
+
+    card.style.transition = 'box-shadow 0.15s';
+    card.style.transform  = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px) scale(1.01)`;
+    card.style.boxShadow  = `
+      ${-rotY * 0.6}px ${rotX * 0.6}px 28px rgba(157,111,255,0.22),
+      0 24px 48px rgba(0,0,0,0.45)
+    `;
+    // shimmer highlight follows cursor
+    card.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(157,111,255,0.07) 0%, transparent 60%), var(--bg-card)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform 0.55s cubic-bezier(.23,1,.32,1), box-shadow 0.55s, background 0.55s';
+    card.style.transform  = '';
+    card.style.boxShadow  = '';
+    card.style.background = '';
+    leaveTimer = setTimeout(() => { card.style.transition = ''; }, 560);
+  });
+});
+
+/* ══════════════════════════════════════════
+   ── MAGNETIC BUTTONS ──
+══════════════════════════════════════════ */
+document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const { left, top, width, height } = btn.getBoundingClientRect();
+    const x = (e.clientX - left - width  / 2) * 0.28;
+    const y = (e.clientY - top  - height / 2) * 0.28;
+    btn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transition = 'transform 0.45s cubic-bezier(.23,1,.32,1)';
+    btn.style.transform  = '';
+    setTimeout(() => btn.style.transition = '', 450);
+  });
+});
+
+/* ══════════════════════════════════════════
+   ── COUNT-UP ANIMATION FOR STATS ──
+══════════════════════════════════════════ */
+const statObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el  = entry.target;
+    const raw = el.textContent.trim();
+    const end = parseInt(raw);
+    if (isNaN(end)) return;
+    let cur = 0;
+    const step = Math.ceil(end / 28);
+    const id   = setInterval(() => {
+      cur = Math.min(cur + step, end);
+      el.textContent = cur + '+';
+      if (cur >= end) clearInterval(id);
+    }, 45);
+    statObserver.unobserve(el);
+  });
+}, { threshold: 0.6 });
+
+document.querySelectorAll('.stat-num').forEach(el => statObserver.observe(el));
+
+/* ══════════════════════════════════════════
+   ── SCROLL PROGRESS BAR ──
+══════════════════════════════════════════ */
+const progressBar = document.createElement('div');
+progressBar.id = 'scroll-progress';
+document.body.prepend(progressBar);
+
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
