@@ -374,6 +374,152 @@ const statObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.stat-num').forEach(el => statObserver.observe(el));
 
 /* ══════════════════════════════════════════
+   ── TEXT SCRAMBLE ON SECTION TITLES ──
+══════════════════════════════════════════ */
+const GLYPHS = '!<>[]{}/?#*@%ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+function scrambleEl(el, duration = 1000) {
+  // Collect all leaf text nodes (preserves nested spans like .g-text)
+  const segments = [];
+  (function walk(node) {
+    node.childNodes.forEach(child => {
+      if (child.nodeType === 3 && child.textContent.trim()) {
+        segments.push({ node: child, original: child.textContent });
+      } else {
+        walk(child);
+      }
+    });
+  })(el);
+
+  let start = null;
+  (function tick(ts) {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / duration, 1);
+
+    segments.forEach(({ node, original }) => {
+      let out = '';
+      for (let i = 0; i < original.length; i++) {
+        if (original[i] === ' ') { out += ' '; continue; }
+        // each char reveals left → right with stagger
+        const reveal = (p - (i / original.length) * 0.55) / 0.45;
+        out += reveal >= 1
+          ? original[i]
+          : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+      node.textContent = out;
+    });
+
+    if (p < 1) requestAnimationFrame(tick);
+  })(0);
+}
+
+// Fire scramble the first time each section title enters view
+const scrambleObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    scrambleEl(entry.target, 1100);
+    scrambleObserver.unobserve(entry.target);
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.section-title').forEach(el => scrambleObserver.observe(el));
+
+/* ══════════════════════════════════════════
+   ── SPARK TRAIL FROM CURSOR ──
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  let lastSpark = 0;
+  const colors = ['#9d6fff', '#22d3ee', '#c084fc', '#38bdf8'];
+
+  document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    if (now - lastSpark < 40) return; // throttle ~25fps
+    lastSpark = now;
+
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    const size = Math.random() * 4 + 2;
+    spark.style.cssText = `
+      left:${e.clientX}px; top:${e.clientY}px;
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      --dx:${(Math.random() - 0.5) * 40}px;
+      --dy:${(Math.random() - 0.5) * 40 - 15}px;
+    `;
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 700);
+  });
+})();
+
+/* ══════════════════════════════════════════
+   ── AMBIENT CURSOR GLOW ──
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  const glow = document.createElement('div');
+  glow.id = 'ambient-glow';
+  document.body.appendChild(glow);
+
+  let tx = -999, ty = -999, gx = -999, gy = -999;
+  document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+
+  (function tick() {
+    gx += (tx - gx) * 0.06;
+    gy += (ty - gy) * 0.06;
+    glow.style.transform = `translate(${gx}px, ${gy}px) translate(-50%, -50%)`;
+    requestAnimationFrame(tick);
+  })();
+})();
+
+/* ══════════════════════════════════════════
+   ── CLICK RIPPLE ──
+══════════════════════════════════════════ */
+document.addEventListener('click', e => {
+  const ripple = document.createElement('div');
+  ripple.className = 'click-ripple';
+  ripple.style.left = e.clientX + 'px';
+  ripple.style.top  = e.clientY + 'px';
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 800);
+});
+
+/* ══════════════════════════════════════════
+   ── HERO MOUSE PARALLAX ──
+══════════════════════════════════════════ */
+(function () {
+  const hero     = document.querySelector('.hero');
+  const orb1     = document.querySelector('.orb-1');
+  const orb2     = document.querySelector('.orb-2');
+  const heroText = document.querySelector('.hero-text');
+  const heroImg  = document.querySelector('.hero-image');
+  if (!hero) return;
+
+  hero.addEventListener('mousemove', e => {
+    const { width, height } = hero.getBoundingClientRect();
+    const x = (e.clientX / width  - 0.5);  // -0.5 → 0.5
+    const y = (e.clientY / height - 0.5);
+
+    if (orb1) orb1.style.transform = `translate(${x * 30}px, ${y * 20}px)`;
+    if (orb2) orb2.style.transform = `translate(${x * -25}px, ${y * -18}px)`;
+    if (heroText) heroText.style.transform = `translate(${x * 8}px, ${y * 6}px)`;
+    if (heroImg)  heroImg.style.transform  = `translate(${x * -10}px, ${y * -8}px)`;
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    [orb1, orb2, heroText, heroImg].forEach(el => {
+      if (el) {
+        el.style.transition = 'transform 0.8s cubic-bezier(.23,1,.32,1)';
+        el.style.transform  = '';
+        setTimeout(() => { if (el) el.style.transition = ''; }, 820);
+      }
+    });
+  });
+})();
+
+/* ══════════════════════════════════════════
    ── SCROLL PROGRESS BAR ──
 ══════════════════════════════════════════ */
 const progressBar = document.createElement('div');

@@ -1315,6 +1315,69 @@ img { display: block; max-width: 100%; }
 .form-note.error   { color: #f87171; }
 
 /* ══════════════════════════════════════════
+   ── SPARK TRAIL ──
+══════════════════════════════════════════ */
+.spark {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%, -50%);
+  animation: spark-out 0.7s ease-out forwards;
+}
+@keyframes spark-out {
+  0%   { opacity: 1;   transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1); }
+  100% { opacity: 0;   transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px) - 18px)) scale(0.1); }
+}
+
+/* ══════════════════════════════════════════
+   ── AMBIENT CURSOR GLOW ──
+══════════════════════════════════════════ */
+#ambient-glow {
+  position: fixed;
+  width: 560px; height: 560px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(157,111,255,0.055) 0%, transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+  top: 0; left: 0;
+  will-change: transform;
+}
+
+/* ══════════════════════════════════════════
+   ── CLICK RIPPLE ──
+══════════════════════════════════════════ */
+.click-ripple {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(157,111,255,0.8);
+  pointer-events: none;
+  z-index: 9996;
+  transform: translate(-50%, -50%);
+  animation: ripple-expand 0.8s cubic-bezier(0, 0.5, 0.5, 1) forwards;
+}
+@keyframes ripple-expand {
+  0%   { width: 6px;   height: 6px;   opacity: 1;   border-color: rgba(157,111,255,0.8); }
+  50%  { border-color: rgba(34,211,238,0.5); }
+  100% { width: 100px; height: 100px; opacity: 0;   border-color: rgba(34,211,238,0); }
+}
+
+/* ══════════════════════════════════════════
+   ── SECTION TITLE SCRAMBLE LOADING STATE ──
+══════════════════════════════════════════ */
+.section-title {
+  will-change: contents;
+}
+
+/* ══════════════════════════════════════════
+   ── HERO PARALLAX SMOOTH TRANSITION ──
+══════════════════════════════════════════ */
+.hero-bg-orb, .hero-text, .hero-image {
+  will-change: transform;
+}
+
+/* ══════════════════════════════════════════
    ── SCROLL PROGRESS BAR ──
 ══════════════════════════════════════════ */
 #scroll-progress {
@@ -1502,5 +1565,5 @@ a, button, [onclick], label { cursor: none; }
   .contact-actions .btn { width: 100%; justify-content: center; }
   /* restore default cursor on touch devices */
   body, a, button, [onclick], label { cursor: auto; }
-  .c-dot, .c-ring { display: none; }
+  .c-dot, .c-ring, #ambient-glow, .spark { display: none; }
 }
