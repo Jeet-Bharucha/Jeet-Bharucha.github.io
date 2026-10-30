@@ -887,6 +887,9 @@ img { display: block; max-width: 100%; }
 .cert-doc-svg svg { width: 40px; height: 40px; }
 .cert-card-new:hover .cert-doc-svg { color: rgba(255,255,255,0.85); transform: scale(1.1); }
 
+.prev-anthropic  { background: linear-gradient(135deg, #1a2010 0%, #3a4a28 60%, #4e6235 100%); }
+.prev-anthropic  .cert-doc-svg { color: rgba(160,200,80,0.7); }
+
 .prev-azure      { background: linear-gradient(135deg, #0a1628 0%, #0d2b52 60%, #0e3d7a 100%); }
 .prev-azure      .cert-doc-svg { color: rgba(0,170,255,0.7); }
 
